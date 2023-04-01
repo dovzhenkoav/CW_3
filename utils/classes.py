@@ -13,27 +13,35 @@ class Transaction:
 
         self._from: str = from_
         self._to: str = to
-        # self._formated_from_card_number = self._format_from_card_number(self._from)
+        self._hidden_from_card_number = self._hide_from_card_number(self._from)
         self._hidden_to_card_info = self._hide_to_card_info(self._to)
 
     def _parse_date(self, date: str) -> str:
         datetime_date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
         return datetime_date.strftime('%d:%m:%Y')
 
-    def _parse_from(self, from_: str) -> tuple[str]:
-        if from_:
-            splitted_from = from_.split()
-            for i in splitted_from:
-                if i.isdigit():
-                    operation_number = i
-                    splitted_from.remove(operation_number)
-                    operation_cardname = " ".join(splitted_from)
 
-                    return tuple([operation_cardname, operation_number])
+    def _parse_from(self, info: str) -> str:
+
+        splitted_from = info.split()
+        for i in splitted_from:
+            if i.isdigit():
+                operation_number = i
+                splitted_from.remove(operation_number)
+                operation_cardname = " ".join(splitted_from)
+
+                return f'{operation_cardname} {operation_number[:4]} {operation_number[4:6]}** **** {operation_number[-4:]}'
+        raise ValueError('В транзакции нет номера счета')
+
+
+    def _hide_from_card_number(self, number: str) -> str:
+        if number:
+            info = self._parse_from(number)
+            return f'{info} -> '
         else:
-            return ""
+            return ''
 
-    def _parse_to(self, to: str) -> tuple[str]:
+    def _parse_to(self, to: str) -> tuple[str, str]:
         splitted_to = to.split()
         for i in splitted_to:
             if i.isdigit():
@@ -43,12 +51,6 @@ class Transaction:
 
                 return operation_cardname, operation_number
 
-    def _format_from_card_number(self, number: str) -> str:
-        if number:
-            return f'{number[:4]} {number[4:6]}** **** {number[-4:]}'
-        else:
-            return '---'
-
     def _hide_to_card_info(self, card_info: str) -> str:
         card_desc, card_num = self._parse_to(card_info)
         # return f'{self._to[0]} **{self._to[1][-4:]}'
@@ -56,7 +58,7 @@ class Transaction:
 
     def show_transaction(self):
         return f'{self._date} {self._description}\n' \
-               f'{self._from} -> {self._hidden_to_card_info}\n' \
+               f'{self._hidden_from_card_number}{self._hidden_to_card_info}\n' \
                f'{self._operation_amount["amount"]} {self._operation_amount["currency"]["name"]}\n\n'
 
 class Transactions:
