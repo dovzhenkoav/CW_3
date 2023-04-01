@@ -1,6 +1,6 @@
 import json
 
-from utils.settings import PATH_TO_JSON
+from settings import PATH_TO_JSON
 
 
 def read_json() -> list[dict]:
