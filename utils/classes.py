@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from settings import NUMBER_OF_RECENT_TRANSACTIONS
+
 
 class Transaction:
     def __init__(self, id: int, state: str, date: str,
@@ -7,7 +9,7 @@ class Transaction:
                  from_: str, to: str):
         self._id: int = id
         self._state: str = state
-        self._date: str = self._parse_date(date)
+        self._date: str = date
         self._operation_amount: dict = operation_amount
         self._description: str = description
 
@@ -16,10 +18,12 @@ class Transaction:
         self._hidden_from_card_number = self._hide_from_card_number(self._from)
         self._hidden_to_card_info = self._hide_to_card_info(self._to)
 
+    def get_state(self):
+        return self._state
+
     def _parse_date(self, date: str) -> str:
         datetime_date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
         return datetime_date.strftime('%d:%m:%Y')
-
 
     def _parse_from(self, info: str) -> str:
 
@@ -32,7 +36,6 @@ class Transaction:
 
                 return f'{operation_cardname} {operation_number[:4]} {operation_number[4:6]}** **** {operation_number[-4:]}'
         raise ValueError('В транзакции нет номера счета')
-
 
     def _hide_from_card_number(self, number: str) -> str:
         if number:
@@ -57,13 +60,15 @@ class Transaction:
         return f'{card_desc} **{card_num[-4:]}'
 
     def show_transaction(self):
-        return f'{self._date} {self._description}\n' \
+        return f'{self._parse_date(self._date)} {self._description}\n' \
                f'{self._hidden_from_card_number}{self._hidden_to_card_info}\n' \
                f'{self._operation_amount["amount"]} {self._operation_amount["currency"]["name"]}\n\n'
+
 
 class Transactions:
     def __init__(self, data: list[dict]):
         self._data: list[Transaction] = self._make_data(data)
+        self._sorted_data = self._sort_data(self._data)
 
     def _make_data(self, data: list[dict]) -> list[Transaction]:
         all_entries = []
@@ -83,11 +88,22 @@ class Transactions:
                     description=entry['description'],
                     from_=entry['from'],
                     to=entry['to'],
-                    ))
+                ))
         return all_entries
 
-    def get_transactions_info(self):
+    def _sort_data(self, data):
+        return sorted(data, key=lambda enrty: enrty._date, reverse=True)
+
+    def get_all_transactions_info(self):
         transactions_log = ''
-        for transaction in self._data:
+        for transaction in self._sorted_data:
+            transactions_log += transaction.show_transaction()
+        return transactions_log
+
+    def get_last_executed_transactions(self, quantity=NUMBER_OF_RECENT_TRANSACTIONS):
+        recent_log = [transaction for transaction in self._sorted_data if transaction.get_state() == 'EXECUTED'][
+                     :quantity]
+        transactions_log = ''
+        for transaction in recent_log:
             transactions_log += transaction.show_transaction()
         return transactions_log
