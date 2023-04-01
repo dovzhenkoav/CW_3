@@ -11,10 +11,10 @@ class Transaction:
         self._operation_amount: dict = operation_amount
         self._description: str = description
 
-        self._from: tuple[str] = self._parse_from(from_)
-        self._to: tuple[str] = self._parse_to(to)
-        self._formated_from_card_number = self._format_from_card_number(self._from)
-        self._formated_to_card_number = self._format_to_card_number(self._to[1])
+        self._from: str = from_
+        self._to: str = to
+        # self._formated_from_card_number = self._format_from_card_number(self._from)
+        self._hidden_to_card_info = self._hide_to_card_info(self._to)
 
     def _parse_date(self, date: str) -> str:
         datetime_date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
@@ -41,7 +41,7 @@ class Transaction:
                 splitted_to.remove(operation_number)
                 operation_cardname = " ".join(splitted_to)
 
-                return tuple([operation_cardname, operation_number])
+                return operation_cardname, operation_number
 
     def _format_from_card_number(self, number: str) -> str:
         if number:
@@ -49,13 +49,15 @@ class Transaction:
         else:
             return '---'
 
-    def _format_to_card_number(self, number: str) -> str:
-        return f'{self._to[0]} **{self._to[1][-4:]}'
+    def _hide_to_card_info(self, card_info: str) -> str:
+        card_desc, card_num = self._parse_to(card_info)
+        # return f'{self._to[0]} **{self._to[1][-4:]}'
+        return f'{card_desc} **{card_num[-4:]}'
 
     def show_transaction(self):
         return f'{self._date} {self._description}\n' \
-               f'{self._from} {self._formated_from_card_number} -> {self._formated_to_card_number}\n' \
-               f'{self._operation_amount["amount"]} {self._operation_amount["currency"]["name"]}\n'
+               f'{self._from} -> {self._hidden_to_card_info}\n' \
+               f'{self._operation_amount["amount"]} {self._operation_amount["currency"]["name"]}\n\n'
 
 class Transactions:
     def __init__(self, data: list[dict]):
