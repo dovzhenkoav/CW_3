@@ -21,8 +21,8 @@ class Transaction:
     def get_state(self):
         return self._state
 
-    def _parse_date(self, date: str) -> str:
-        datetime_date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
+    def _parse_date(self) -> str:
+        datetime_date = datetime.strptime(self._date, '%Y-%m-%dT%H:%M:%S.%f')
         return datetime_date.strftime('%d:%m:%Y')
 
     def _parse_from(self, info: str) -> str:
@@ -56,11 +56,10 @@ class Transaction:
 
     def _hide_to_card_info(self, card_info: str) -> str:
         card_desc, card_num = self._parse_to(card_info)
-        # return f'{self._to[0]} **{self._to[1][-4:]}'
         return f'{card_desc} **{card_num[-4:]}'
 
     def show_transaction(self):
-        return f'{self._parse_date(self._date)} {self._description}\n' \
+        return f'{self._parse_date()} {self._description}\n' \
                f'{self._hidden_from_card_number}{self._hidden_to_card_info}\n' \
                f'{self._operation_amount["amount"]} {self._operation_amount["currency"]["name"]}\n\n'
 

@@ -10,6 +10,9 @@ packages = [{include = "cw_3"}]
 python = "^3.11"
 
 
+[tool.poetry.group.dev.dependencies]
+coverage = "^7.2.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
