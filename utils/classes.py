@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 
 from settings import NUMBER_OF_RECENT_TRANSACTIONS
 
@@ -65,9 +66,15 @@ class Transaction:
 
 
 class Transactions:
-    def __init__(self, data: list[dict]):
-        self._data: list[Transaction] = self._make_data(data)
+    def __init__(self, path: str):
+        self._json: list[dict] = self._load_json(path)
+        self._data: list[Transaction] = self._make_data(self._json)
         self._sorted_data = self._sort_data(self._data)
+        self._number_of_recent_transaction = NUMBER_OF_RECENT_TRANSACTIONS
+
+    def _load_json(self, path: str):
+        with open(path, mode='r', encoding='utf-8') as file:
+            return json.load(file)
 
     def _make_data(self, data: list[dict]) -> list[Transaction]:
         all_entries = []
@@ -99,9 +106,9 @@ class Transactions:
             transactions_log += transaction.show_transaction()
         return transactions_log
 
-    def get_last_executed_transactions(self, quantity=NUMBER_OF_RECENT_TRANSACTIONS):
+    def get_last_executed_transactions(self):
         recent_log = [transaction for transaction in self._sorted_data if transaction.get_state() == 'EXECUTED'][
-                     :quantity]
+                     :self._number_of_recent_transaction]
         transactions_log = ''
         for transaction in recent_log:
             transactions_log += transaction.show_transaction()

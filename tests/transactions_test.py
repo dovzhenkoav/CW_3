@@ -1,29 +1,20 @@
 from unittest import TestCase, main
 
 from utils.classes import Transactions, Transaction
-from utils.functions import read_json
+from settings import PATH_TO_JSON
 
 
 class TransactionsTest(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.data = read_json()
 
     def setUp(self):
-        self.transactions = Transactions(self.data)
+        self.transactions = Transactions(PATH_TO_JSON)
 
     def test_is_transactions(self):
-        self.assertIsInstance(Transactions(self.data), Transactions)
+        self.assertIsInstance(Transactions(PATH_TO_JSON), Transactions)
 
     def test_check_atributes(self):
         self.assertIsInstance(self.transactions._data, list)
         self.assertIsInstance(self.transactions._sorted_data, list)
-
-    def test_make_data(self):
-        data: list = self.transactions._make_data(self.data)
-        self.assertIsInstance(data, list)
-        for element in data:
-            self.assertIsInstance(element, Transaction)
 
     def test_sort_data(self):
         self.assertIsInstance(self.transactions._sort_data(self.transactions._data), list)

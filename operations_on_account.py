@@ -1,10 +1,9 @@
-from utils.functions import read_json
 from utils.classes import Transactions
+from settings import PATH_TO_JSON
 
 
 def get_operations_on_account():
-    data = read_json()
-    transactions = Transactions(data)
+    transactions = Transactions(PATH_TO_JSON)
     print(transactions.get_last_executed_transactions(), end='')
 
 
