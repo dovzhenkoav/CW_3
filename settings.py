@@ -1,3 +1,3 @@
 import os
 
-PATH_TO_JSON = os.path.join(r'.\data\operations.json')  # Путь до JSON файла в папке data
+PATH_TO_JSON = os.path.join("data", "operations.json")  # Путь до JSON файла в папке data
