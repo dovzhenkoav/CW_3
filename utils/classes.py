@@ -78,7 +78,8 @@ class Transactions:
         self._sorted_data = self._sort_data(self._data)
         self.number_of_recent_transaction = 5
 
-    def _load_json(self, path: str):
+    @staticmethod
+    def _load_json(path: str):
         """Преобразовываем файл JSON в привычный для питона формат(list[dict]) и загоняем в атрибут self._json"""
         with open(path, mode='r', encoding='utf-8') as file:
             return json.load(file)
@@ -104,6 +105,7 @@ class Transactions:
                     to=entry['to'],
                 ))
         return all_entries
+
 
     def _sort_data(self, data):
         """Транзакции сортируются по дате от новых к старым"""
